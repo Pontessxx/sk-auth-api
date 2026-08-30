@@ -1,3 +1,11 @@
-global using Skynet.API.Extensions;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.OpenApi;
 global using System.Reflection;
+global using Asp.Versioning;
+global using Skynet.Infra;
+global using Skynet.Application;
+global using Skynet.Application.Services;
+global using Skynet.Application.Models.Auth;
+global using Skynet.Application.Models.User;
+global using Skynet.API.Extensions;
