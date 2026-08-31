@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Skynet.API/Skynet.API.csproj" />
+  <Project Path="Skynet.Application/Skynet.Application.csproj" />
   <Project Path="Skynet.Domain/Skynet.Domain.csproj" />
   <Project Path="Skynet.Infra/Skynet.Infra.csproj" />
 </Solution>

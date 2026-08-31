@@ -1,0 +1,15 @@
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Skynet.Domain.Interfaces;
+global using Skynet.Domain.Entities;
+global using Skynet.Domain.Settings;
+global using Skynet.Infra.Data;
+global using Skynet.Infra.Repositories;
+global using Skynet.Infra.Security;
+global using System.IdentityModel.Tokens.Jwt;
+global using System.Security.Claims;
+global using System.Security.Cryptography;
+global using System.Text;
+global using Microsoft.IdentityModel.Tokens;
+global using Microsoft.Extensions.Options;
