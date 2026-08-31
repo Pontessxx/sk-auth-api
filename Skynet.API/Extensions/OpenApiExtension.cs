@@ -16,6 +16,17 @@ public static class OpenApiConfigurationExtension
             c.UseInlineDefinitionsForEnums();
             c.DocInclusionPredicate((docName, apiDesc) => apiDesc.GroupName == docName);
 
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Informe o token JWT no formato: Bearer {seu token}"
+            });
+            c.OperationFilter<AuthorizeOperationFilter>();
+
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             if (File.Exists(xmlPath))

@@ -20,8 +20,11 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddOpenApiConfig();
 builder.Services.AddFrontendCorsConfig(builder.Configuration);
+builder.Services.AddJwtAuthenticationConfig();
 
 var app = builder.Build();
+
+app.ValidateJwtSettings();
 
 if (app.Environment.IsDevelopment())
 {
@@ -31,6 +34,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("Frontend");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
