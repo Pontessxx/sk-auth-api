@@ -10,7 +10,7 @@ public class AuthService : IAuthService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<UserResponse> RegisterAsync(RegisterRequest request)
+    public async Task<BaseResponse> RegisterAsync(RegisterRequest request)
     {
         var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
         if (existingUser != null)
@@ -26,15 +26,14 @@ public class AuthService : IAuthService
 
         await _userRepository.AddAsync(user);
 
-        return new UserResponse
+        return new BaseResponse
         {
             Id = user.Id,
             Username = user.Username,
-            Role = user.Role
         };
     }
     
-    public async Task<BaseResponse> LoginAsync(LoginRequest request)
+    public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
         var user = await _userRepository.GetByUsernameAsync(request.Username) ?? throw new UnauthorizedAccessException("User not found.");
 
@@ -44,7 +43,7 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Invalid username or password.");
         }
 
-        return new BaseResponse
+        return new LoginResponse
         {
             Id = user.Id,
             Username = user.Username,

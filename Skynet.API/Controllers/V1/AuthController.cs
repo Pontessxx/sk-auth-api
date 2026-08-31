@@ -17,7 +17,7 @@ public class AuthController : ControllerBase
     /// <param name="loginRequest">The login request containing username and password.</param>
     /// <returns>The authenticated user's data along with the JWT access and refresh tokens.</returns>
     [HttpPost("login")]
-    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
@@ -38,7 +38,7 @@ public class AuthController : ControllerBase
     /// <param name="registerRequest">The registration request containing user details.</param>
     /// <returns>The created user.</returns>
     [HttpPost("register")]
-    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
     {
