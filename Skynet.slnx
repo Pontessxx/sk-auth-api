@@ -3,4 +3,10 @@
   <Project Path="Skynet.Application/Skynet.Application.csproj" />
   <Project Path="Skynet.Domain/Skynet.Domain.csproj" />
   <Project Path="Skynet.Infra/Skynet.Infra.csproj" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Skynet.API.Tests/Skynet.API.Tests.csproj" />
+    <Project Path="Tests/Skynet.Application.Tests/Skynet.Application.Tests.csproj" />
+    <Project Path="Tests/Skynet.Domain.Tests/Skynet.Domain.Tests.csproj" />
+    <Project Path="Tests/Skynet.Infra.Tests/Skynet.Infra.Tests.csproj" />
+  </Folder>
 </Solution>

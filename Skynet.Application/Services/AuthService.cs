@@ -130,7 +130,6 @@ public class AuthService : IAuthService
         {
             Id = user.Id,
             Username = user.Username,
-            Role = user.Role,
             AccessToken = accessToken,
             RefreshToken = rawRefreshToken
         };
