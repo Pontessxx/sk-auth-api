@@ -23,5 +23,9 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>()
             .Property(u => u.IsActive)
             .HasDefaultValue(true);
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
     }
 }
