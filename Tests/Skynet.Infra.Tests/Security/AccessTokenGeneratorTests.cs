@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using Skynet.Domain.Entities;
 using Skynet.Domain.Enums;
 using Skynet.Domain.Settings;
@@ -8,9 +9,11 @@ namespace Skynet.Infra.Tests.Security;
 
 public class AccessTokenGeneratorTests
 {
+    private static readonly RSA _rsa = RSA.Create(2048);
+
     private readonly JwtSettings _settings = new()
     {
-        Key = "super-secret-test-key-with-at-least-32-bytes",
+        PrivateKey = _rsa.ExportRSAPrivateKeyPem(),
         Issuer = "skynet-tests",
         Audience = "skynet-tests",
         AccessTokenExpirationMinutes = 15

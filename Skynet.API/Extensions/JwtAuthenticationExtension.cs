@@ -12,6 +12,11 @@ public static class JwtAuthenticationExtension
             .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
             .Configure<JwtSettings>((options, jwtSettings) =>
             {
+                var rsa = RSA.Create();
+                rsa.ImportFromPem(jwtSettings.PublicKey);
+
+                var securityKey = new RsaSecurityKey(rsa);
+
                 options.MapInboundClaims = false;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -20,10 +25,11 @@ public static class JwtAuthenticationExtension
                     ValidateAudience = true,
                     ValidAudience = jwtSettings.Audience,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                    IssuerSigningKey = securityKey,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromSeconds(30)
                 };
+
                 options.Events = new JwtBearerEvents
                 {
                     OnTokenValidated = async context =>
@@ -31,7 +37,7 @@ public static class JwtAuthenticationExtension
                         var jti = context.Principal?.FindFirstValue("jti");
                         if (string.IsNullOrEmpty(jti))
                         {
-                            context.Fail("Token inválido.");
+                            context.Fail("Invalid Token");
                             return;
                         }
 
@@ -40,7 +46,7 @@ public static class JwtAuthenticationExtension
 
                         if (await tokenBlacklistRepository.IsRevokedAsync(jti, context.HttpContext.RequestAborted))
                         {
-                            context.Fail("Token revogado.");
+                            context.Fail("Revoked Token");
                         }
                     },
                     OnChallenge = async context =>
@@ -51,7 +57,7 @@ public static class JwtAuthenticationExtension
                         await context.Response.WriteAsJsonAsync(new ProblemDetails
                         {
                             Status = StatusCodes.Status401Unauthorized,
-                            Title = "Token ausente, inválido, expirado ou revogado."
+                            Title = "Token missing, invalid or revoked."
                         });
                     }
                 };
@@ -66,10 +72,21 @@ public static class JwtAuthenticationExtension
     {
         var jwtSettings = app.Services.GetRequiredService<JwtSettings>();
 
-        if (Encoding.UTF8.GetByteCount(jwtSettings.Key) < 32)
+        if (string.IsNullOrWhiteSpace(jwtSettings.PublicKey))
         {
             throw new InvalidOperationException(
-                "Jwt:Key ausente ou curta demais (mínimo 32 bytes). Defina-a pela variável de ambiente Jwt__Key — nunca em appsettings.json.");
+                "Jwt:PublicKey missing or null. define by using the environment variable Jwt__PublicKey — never in appsettings.json.");
+        }
+        try
+        {
+            var rsa = RSA.Create();
+            rsa.ImportFromPem(jwtSettings.PublicKey);
+            rsa.Dispose();
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                "Jwt:PublicKey invalid. Check if it is in a valid PEM format.", ex);
         }
 
         return app;

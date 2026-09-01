@@ -16,3 +16,4 @@ global using Skynet.Domain.Settings;
 global using Skynet.Domain.Interfaces;
 global using Skynet.API.Extensions;
 global using Skynet.API.Filters;
+global using System.Security.Cryptography;

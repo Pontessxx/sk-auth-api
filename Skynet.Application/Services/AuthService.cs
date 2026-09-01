@@ -63,7 +63,7 @@ public class AuthService : IAuthService
 
         if (!user.IsActive)
         {
-            throw new UnauthorizedAccessException("Usuário desativado.");
+            throw new UnauthorizedAccessException("Deactivated User.");
         }
 
         return await IssueTokensAsync(user);
@@ -73,19 +73,19 @@ public class AuthService : IAuthService
     {
         var tokenHash = _refreshTokenGenerator.Hash(refreshToken);
         var storedRefreshToken = await _refreshTokenRepository.GetByTokenHashAsync(tokenHash)
-            ?? throw new UnauthorizedAccessException("Refresh token inválido ou expirado.");
+            ?? throw new UnauthorizedAccessException("Refresh token expired or not found.");
 
         if (!storedRefreshToken.IsActive)
         {
-            throw new UnauthorizedAccessException("Refresh token inválido ou expirado.");
+            throw new UnauthorizedAccessException("Refresh token expired or not found.");
         }
 
         var user = await _userRepository.GetByIdAsync(storedRefreshToken.UserId)
-            ?? throw new UnauthorizedAccessException("Usuário não encontrado.");
+            ?? throw new UnauthorizedAccessException("User not found.");
 
         if (!user.IsActive)
         {
-            throw new UnauthorizedAccessException("Usuário desativado.");
+            throw new UnauthorizedAccessException("Deactivated User.");
         }
 
         var response = await IssueTokensAsync(user, storedRefreshToken);

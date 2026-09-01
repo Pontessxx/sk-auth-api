@@ -16,7 +16,7 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
-        services.AddScoped<IAccessTokenGenerator, AccessTokenGenerator>();
+        services.AddSingleton<IAccessTokenGenerator, AccessTokenGenerator>();
         services.AddScoped<ITokenBlacklistRepository, TokenBlacklistRepository>();
 
         return services;

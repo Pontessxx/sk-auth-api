@@ -1,12 +1,15 @@
 namespace Skynet.Infra.Security;
 
-public class AccessTokenGenerator : IAccessTokenGenerator
+public class AccessTokenGenerator : IAccessTokenGenerator, IDisposable
 {
     private readonly JwtSettings _settings;
+    private readonly RSA _rsa;
 
     public AccessTokenGenerator(JwtSettings settings)
     {
         _settings = settings;
+        _rsa = RSA.Create();
+        _rsa.ImportFromPem(_settings.PrivateKey);
     }
 
     public (string Token, DateTime ExpiresAt) Generate(User user)
@@ -24,8 +27,8 @@ public class AccessTokenGenerator : IAccessTokenGenerator
         };
 
         var credentials = new SigningCredentials(
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key)),
-            SecurityAlgorithms.HmacSha256);
+            new RsaSecurityKey(_rsa),
+            SecurityAlgorithms.RsaSha256);
 
         var token = new JwtSecurityToken(
             issuer: _settings.Issuer,
@@ -35,5 +38,11 @@ public class AccessTokenGenerator : IAccessTokenGenerator
             signingCredentials: credentials);
 
         return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
+    }
+
+    public void Dispose()
+    {
+        _rsa.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
