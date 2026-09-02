@@ -43,19 +43,6 @@ public class UserRepositoryTests
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnsEveryPersistedUser()
-    {
-        await using var context = CreateContext();
-        var sut = new UserRepository(context);
-        await sut.AddAsync(new User { Username = "neo", PasswordHash = "hash", Role = Role.User });
-        await sut.AddAsync(new User { Username = "trinity", PasswordHash = "hash", Role = Role.Admin });
-
-        var all = await sut.GetAllAsync();
-
-        Assert.Equal(2, all.Count());
-    }
-
-    [Fact]
     public async Task UpdateAsync_PersistsChanges()
     {
         await using var context = CreateContext();

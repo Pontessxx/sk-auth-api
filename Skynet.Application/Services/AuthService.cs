@@ -9,6 +9,7 @@ public class AuthService : IAuthService
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly ITokenBlacklistRepository _tokenBlacklistRepository;
     private readonly JwtSettings _jwtSettings;
+    private readonly ILogger<AuthService> _logger; 
 
     public AuthService(
         IUserRepository userRepository,
@@ -17,7 +18,8 @@ public class AuthService : IAuthService
         IRefreshTokenGenerator refreshTokenGenerator,
         IRefreshTokenRepository refreshTokenRepository,
         ITokenBlacklistRepository tokenBlacklistRepository,
-        JwtSettings jwtSettings)
+        JwtSettings jwtSettings,
+        ILogger<AuthService> logger)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
@@ -26,6 +28,7 @@ public class AuthService : IAuthService
         _refreshTokenRepository = refreshTokenRepository;
         _tokenBlacklistRepository = tokenBlacklistRepository;
         _jwtSettings = jwtSettings;
+        _logger = logger;
     }
 
     public async Task<BaseResponse> RegisterAsync(RegisterRequest request)
@@ -63,6 +66,7 @@ public class AuthService : IAuthService
 
         if (!user.IsActive)
         {
+            _logger.LogWarning("Deactivated user login attempt: {Username}", user.Username);
             throw new UnauthorizedAccessException("Deactivated User.");
         }
 
@@ -77,6 +81,7 @@ public class AuthService : IAuthService
 
         if (!storedRefreshToken.IsActive)
         {
+            _logger.LogWarning("Reused or revoked refresh token detected for user {UserId}.", storedRefreshToken.UserId);
             throw new UnauthorizedAccessException("Refresh token expired or not found.");
         }
 
@@ -85,6 +90,7 @@ public class AuthService : IAuthService
 
         if (!user.IsActive)
         {
+            _logger.LogWarning("Deactivated user refresh attempt: {Username}", user.Username);
             throw new UnauthorizedAccessException("Deactivated User.");
         }
 

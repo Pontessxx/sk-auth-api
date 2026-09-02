@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Moq;
 using Skynet.Application.Models.Auth;
 using Skynet.Application.Services;
@@ -16,6 +17,7 @@ public class AuthServiceTests
     private readonly Mock<IRefreshTokenGenerator> _refreshTokenGenerator = new();
     private readonly Mock<IRefreshTokenRepository> _refreshTokenRepository = new();
     private readonly Mock<ITokenBlacklistRepository> _tokenBlacklistRepository = new();
+    private readonly Mock<ILogger<AuthService>> _logger = new();
     private readonly JwtSettings _jwtSettings = new() { RefreshTokenExpirationDays = 7 };
 
     private AuthService CreateSut() => new(
@@ -25,7 +27,8 @@ public class AuthServiceTests
         _refreshTokenGenerator.Object,
         _refreshTokenRepository.Object,
         _tokenBlacklistRepository.Object,
-        _jwtSettings);
+        _jwtSettings,
+        _logger.Object);
 
     private static User CreateUser(bool isActive = true) => new()
     {

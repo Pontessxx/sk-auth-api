@@ -6,7 +6,6 @@ global using Microsoft.OpenApi;
 global using Swashbuckle.AspNetCore.SwaggerGen;
 global using System.Reflection;
 global using System.Security.Claims;
-global using System.Text;
 global using Asp.Versioning;
 global using Skynet.Infra;
 global using Skynet.Application;

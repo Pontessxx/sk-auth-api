@@ -5,3 +5,4 @@ global using Skynet.Domain.Interfaces;
 global using Skynet.Domain.Entities;
 global using Skynet.Domain.Settings;
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
