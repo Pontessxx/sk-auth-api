@@ -12,6 +12,9 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
 
+        services.Configure<RateLimitSettings>(configuration.GetSection(RateLimitSettings.SectionName));
+        services.AddSingleton(sp => sp.GetRequiredService<IOptions<RateLimitSettings>>().Value);
+
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

@@ -31,7 +31,7 @@ public class AuthService : IAuthService
         _logger = logger;
     }
 
-    public async Task<BaseResponse> RegisterAsync(RegisterRequest request)
+    public async Task<LoginResponse> RegisterAsync(RegisterRequest request)
     {
         var existingUser = await _userRepository.GetByUsernameAsync(request.Username);
         if (existingUser != null)
@@ -47,14 +47,17 @@ public class AuthService : IAuthService
 
         await _userRepository.AddAsync(user);
 
-        return new BaseResponse
+        var (accessToken, _) = _accessTokenGenerator.Generate(user);
+
+        return new LoginResponse
         {
             Id = user.Id,
             Username = user.Username,
+            AccessToken = accessToken
         };
     }
 
-    public async Task<LoginResponse> LoginAsync(LoginRequest request)
+    public async Task<LoginResult> LoginAsync(LoginRequest request)
     {
         var user = await _userRepository.GetByUsernameAsync(request.Username) ?? throw new UnauthorizedAccessException("User not found.");
 
@@ -73,7 +76,7 @@ public class AuthService : IAuthService
         return await IssueTokensAsync(user);
     }
 
-    public async Task<LoginResponse> RefreshAsync(string refreshToken)
+    public async Task<LoginResult> RefreshAsync(string refreshToken)
     {
         var tokenHash = _refreshTokenGenerator.Hash(refreshToken);
         var storedRefreshToken = await _refreshTokenRepository.GetByTokenHashAsync(tokenHash)
@@ -113,7 +116,7 @@ public class AuthService : IAuthService
         }
     }
 
-    private async Task<LoginResponse> IssueTokensAsync(User user, RefreshToken? replacedToken = null)
+    private async Task<LoginResult> IssueTokensAsync(User user, RefreshToken? replacedToken = null)
     {
         var (accessToken, _) = _accessTokenGenerator.Generate(user);
         var rawRefreshToken = _refreshTokenGenerator.Generate();
@@ -132,7 +135,7 @@ public class AuthService : IAuthService
             replacedToken.ReplacedByTokenId = newRefreshToken.Id;
         }
 
-        return new LoginResponse
+        return new LoginResult
         {
             Id = user.Id,
             Username = user.Username,

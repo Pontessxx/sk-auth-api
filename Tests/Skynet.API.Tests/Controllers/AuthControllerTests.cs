@@ -30,21 +30,24 @@ public class AuthControllerTests
     [Fact]
     public async Task Login_WithValidCredentials_ReturnsOkAndSetsRefreshTokenCookie()
     {
-        var response = new LoginResponse
+        var result = new LoginResult
         {
             Id = Guid.NewGuid(),
             Username = "neo",
             AccessToken = "access-token",
             RefreshToken = "raw-refresh-token"
         };
-        _authService.Setup(s => s.LoginAsync(It.IsAny<LoginRequest>())).ReturnsAsync(response);
+        _authService.Setup(s => s.LoginAsync(It.IsAny<LoginRequest>())).ReturnsAsync(result);
 
         var sut = CreateSut();
 
-        var result = await sut.Login(new LoginRequest { Username = "neo", Password = "P@ssw0rd" });
+        var actionResult = await sut.Login(new LoginRequest { Username = "neo", Password = "P@ssw0rd" });
 
-        var ok = Assert.IsType<OkObjectResult>(result);
-        Assert.Same(response, ok.Value);
+        var ok = Assert.IsType<OkObjectResult>(actionResult);
+        var response = Assert.IsType<LoginResponse>(ok.Value);
+        Assert.Equal(result.Id, response.Id);
+        Assert.Equal(result.Username, response.Username);
+        Assert.Equal(result.AccessToken, response.AccessToken);
 
         var setCookie = sut.ControllerContext.HttpContext.Response.Headers.SetCookie.ToString();
         Assert.Contains("refreshToken=raw-refresh-token", setCookie);
@@ -78,22 +81,25 @@ public class AuthControllerTests
     [Fact]
     public async Task Refresh_WithValidCookie_ForwardsTokenAndRotatesCookie()
     {
-        var response = new LoginResponse
+        var result = new LoginResult
         {
             Id = Guid.NewGuid(),
             Username = "neo",
             AccessToken = "new-access-token",
             RefreshToken = "new-raw-refresh-token"
         };
-        _authService.Setup(s => s.RefreshAsync("old-raw-refresh-token")).ReturnsAsync(response);
+        _authService.Setup(s => s.RefreshAsync("old-raw-refresh-token")).ReturnsAsync(result);
 
         var sut = CreateSut();
         sut.ControllerContext.HttpContext.Request.Headers.Append("Cookie", "refreshToken=old-raw-refresh-token");
 
-        var result = await sut.Refresh();
+        var actionResult = await sut.Refresh();
 
-        var ok = Assert.IsType<OkObjectResult>(result);
-        Assert.Same(response, ok.Value);
+        var ok = Assert.IsType<OkObjectResult>(actionResult);
+        var response = Assert.IsType<LoginResponse>(ok.Value);
+        Assert.Equal(result.Id, response.Id);
+        Assert.Equal(result.Username, response.Username);
+        Assert.Equal(result.AccessToken, response.AccessToken);
 
         var setCookie = sut.ControllerContext.HttpContext.Response.Headers.SetCookie.ToString();
         Assert.Contains("refreshToken=new-raw-refresh-token", setCookie);

@@ -23,15 +23,17 @@ public class AuthController : ControllerBase
     /// <param name="loginRequest">The login request containing username and password.</param>
     /// <returns>The authenticated user's data along with the JWT access token. The refresh token is set as an HttpOnly cookie.</returns>
     [HttpPost("login")]
+    [EnableRateLimiting(RateLimitingExtension.LoginPolicy)]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
         try
         {
             var result = await _authService.LoginAsync(loginRequest);
             AppendRefreshTokenCookie(result.RefreshToken);
-            return Ok(result);
+            return Ok(LoginResponse.FromResult(result));
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -45,8 +47,10 @@ public class AuthController : ControllerBase
     /// <param name="registerRequest">The registration request containing user details.</param>
     /// <returns>The created user.</returns>
     [HttpPost("register")]
-    [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+    [EnableRateLimiting(RateLimitingExtension.RegisterPolicy)]
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
     {
         try
@@ -65,8 +69,10 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>A new JWT access token. The rotated refresh token is set as an HttpOnly cookie.</returns>
     [HttpPost("refresh")]
+    [EnableRateLimiting(RateLimitingExtension.RefreshPolicy)]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Refresh()
     {
         if (!Request.Cookies.TryGetValue(RefreshTokenCookieName, out var refreshToken) || string.IsNullOrEmpty(refreshToken))
@@ -78,7 +84,7 @@ public class AuthController : ControllerBase
         {
             var result = await _authService.RefreshAsync(refreshToken);
             AppendRefreshTokenCookie(result.RefreshToken);
-            return Ok(result);
+            return Ok(LoginResponse.FromResult(result));
         }
         catch (UnauthorizedAccessException ex)
         {

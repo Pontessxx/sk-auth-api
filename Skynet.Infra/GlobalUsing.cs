@@ -5,6 +5,7 @@ global using Skynet.Domain.Interfaces;
 global using Skynet.Domain.Entities;
 global using Skynet.Domain.Settings;
 global using Skynet.Infra.Data;
+global using Skynet.Infra.Settings;
 global using Skynet.Infra.Repositories;
 global using Skynet.Infra.Security;
 global using System.IdentityModel.Tokens.Jwt;

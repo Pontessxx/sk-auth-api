@@ -27,6 +27,7 @@ builder.Services.AddApplication();
 builder.Services.AddOpenApiConfig();
 builder.Services.AddFrontendCorsConfig(builder.Configuration);
 builder.Services.AddJwtAuthenticationConfig();
+builder.Services.AddRateLimitingConfig(builder.Configuration);
 
 var app = builder.Build();
 
@@ -43,6 +44,8 @@ app.UseCors("Frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

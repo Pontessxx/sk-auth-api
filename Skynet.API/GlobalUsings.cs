@@ -15,4 +15,7 @@ global using Skynet.Domain.Settings;
 global using Skynet.Domain.Interfaces;
 global using Skynet.API.Extensions;
 global using Skynet.API.Filters;
+global using Skynet.Infra.Settings;
 global using System.Security.Cryptography;
+global using System.Threading.RateLimiting;
+global using Microsoft.AspNetCore.RateLimiting;
